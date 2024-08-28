@@ -1,0 +1,21 @@
+main {
+  background-color: #ffbb5c;
+  width: 100%;
+  overflow-x: hidden;
+  white-space: nowrap;
+  display: flex;
+  pointer-events: none;
+  align-items: flex-end;
+  height: 100dvh;
+}
+
+.blocks {
+  display: inline-flex;
+  gap: 100px;
+  align-items: baseline;
+}
+
+.block {
+  background-color: #c63d2f;
+  width: 5rem;
+}
