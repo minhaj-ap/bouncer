@@ -14,8 +14,27 @@ main {
   gap: 100px;
   align-items: baseline;
 }
-
+.blocks .block:first-child {
+  margin-left: 10em;
+}
 .block {
   background-color: #c63d2f;
   width: 5rem;
+}
+.controller {
+  position: fixed;
+  top: 10%;
+  left: calc(100dvw / 2);
+  pointer-events: all;
+  transform: translateX(-50%);
+}
+.play button {
+  padding: 1rem;
+  border-radius: 5px;
+  font-size: x-large;
+  font-weight: 700;
+  width: 7rem;
+  color: #e25e3e;
+  background: #ffbb5c;
+  border: 0.3rem solid;
 }
