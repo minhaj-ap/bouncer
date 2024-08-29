@@ -30,11 +30,6 @@ function App() {
               containerRef.current.clientWidth >=
             containerRef.current.scrollWidth
           ) {
-            console.log(
-              blocks[blocks.length],
-              blocks[blocks.length - 1],
-              blocks
-            );
             setBlocks((prevBlocks) => [
               ...prevBlocks,
               generateRandom(prevBlocks[prevBlocks.length - 1]),
