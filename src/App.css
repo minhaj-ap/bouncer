@@ -38,3 +38,18 @@ main {
   background: #ffbb5c;
   border: 0.3rem solid;
 }
+.player {
+  height: 5rem;
+  width: 4rem;
+  background-color: black;
+  position: absolute;
+  left: calc(10rem + 7px);
+  border-radius: 8px;
+}
+.up {
+  position: absolute;
+  pointer-events: all;
+  padding: 10px;
+  font-size: x-large;
+  top: 1%;
+}
