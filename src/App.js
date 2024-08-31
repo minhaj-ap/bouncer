@@ -15,10 +15,13 @@ function App() {
       })
   );
   // The bottom gap of the block changes on sound
-  const [bottomGap, setBottomGap] = useState(blocks[0] * 5);
+  const [bottomGap, setBottomGap] = useState(blocks[0] * 5 + 1);
   const [scrolling, setScrolling] = useState(false);
+  const [widths, setWidths] = useState([]);
   const containerRef = useRef(null);
-  const buttonRef = useRef(null);
+  const intervalRef = useRef(null);
+  const playerRef = useRef(null);
+  const blocksRef = useRef([]);
   useEffect(() => {
     let intervalId;
     if (scrolling) {
@@ -41,26 +44,55 @@ function App() {
     return () => clearInterval(intervalId);
   }, [scrolling]);
   useEffect(() => {
-    const button = buttonRef.current;
-    if (button) {
-      const handleMouseDown = (e) => {
-        console.log("triggered");
-        increaseHeight();
-      };
-
-      button.addEventListener("mousedown", handleMouseDown);
-
-      // Clean up the event listener on component unmount
-      return () => {
-        button.removeEventListener("mousedown", handleMouseDown);
-      };
+    if (scrolling) {
+      intervalRef.current = setInterval(() => {
+        DecreseHeight();
+      }, 500); // Decrease height every 500ms
+    } else {
+      clearInterval(intervalRef.current);
+    }
+    return () => clearInterval(intervalRef.current); // Clean up on unmount
+  }, [scrolling]);
+  useEffect(() => {
+    if (bottomGap <= 0) {
+      setScrolling(false);
+      setBlocks((prev) => [prev[0], prev[1], prev[2]]);
+      setBottomGap(blocks[0] * 5 + 1);
+      alert("You lost !!!");
     }
   }, [bottomGap]);
+  useEffect(() => {
+    const playerRect = playerRef.current.getBoundingClientRect();
+    blocksRef.current.forEach((blockRef) => {
+      if (blockRef) {
+        const blockRect = blockRef.getBoundingClientRect();
+        if (
+          playerRect.left < blockRect.left + blockRect.width &&
+          playerRect.left + playerRect.width > blockRect.left &&
+          playerRect.top < blockRect.top + blockRect.height &&
+          playerRect.height + playerRect.top > blockRect.top
+        ) {
+          console.log("collision detected");
+        }
+      }
+    });
+  }, [blocks]);
+  useEffect(() => {
+    // Generate widths only for new blocks that don't have a width yet
+    if (widths.length < blocks.length) {
+      const newWidths = blocks
+        .slice(widths.length) // Only process new blocks
+        .map((x) => generateRandom(x));
+
+      setWidths((prev) => [...prev, ...newWidths]);
+    }
+  }, [blocks, widths]);
+
   function increaseHeight() {
     setBottomGap((prev) => (prev += 5));
   }
   function DecreseHeight() {
-    setBottomGap((prev) => (prev -= 5));
+    setBottomGap((prev) => Math.max((prev -= 2), 0));
   }
   return (
     <>
@@ -77,34 +109,26 @@ function App() {
           )}
         </div>
         {scrolling && (
-          <>
-            <button
-              className="up"
-              onClick={() => increaseHeight}
-              ref={buttonRef}
-            >
-              HIGH!!!
-            </button>
-            <button
-              className="up"
-              style={{ top: "10%" }}
-              onClick={DecreseHeight}
-            >
-              Down
-            </button>
-          </>
+          <button className="up" onClick={() => increaseHeight()}>
+            HIGH!!!
+          </button>
         )}
         <span
           className="player"
-          style={{ bottom: `${bottomGap + 1}rem` }}
+          ref={playerRef}
+          style={{ bottom: `${bottomGap}rem` }}
         ></span>
         <div className="blocks">
           {blocks.map((x, index) => {
             return (
               <div
                 key={index}
+                ref={(el) => (blocksRef.current[index] = el)}
                 className="block"
-                style={{ height: `${x * 5}rem` }}
+                style={{
+                  height: `${x * 5}rem`,
+                  width: `${widths[index] * 3}rem`,
+                }}
               ></div>
             );
           })}
