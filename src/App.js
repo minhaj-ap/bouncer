@@ -60,7 +60,7 @@ function App() {
       setBottomGap(blocks[0] * 5 + 1);
       alert("You lost !!!");
     }
-  }, [bottomGap]);
+  }, [bottomGap, blocks]);
   useEffect(() => {
     const playerRect = playerRef.current.getBoundingClientRect();
     blocksRef.current.forEach((blockRef) => {
