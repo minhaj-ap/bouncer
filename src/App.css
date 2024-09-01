@@ -43,7 +43,7 @@ main {
   width: 4rem;
   background-color: black;
   position: absolute;
-  left: calc(10em + 7px);
+  left: 10em;
   transition: bottom 0.3s ease-in-out;
 }
 .up {

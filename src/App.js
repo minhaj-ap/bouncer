@@ -82,20 +82,17 @@ function App() {
   }, [blocks, failed]);
   useEffect(() => {
     const playerRect = playerRef.current.getBoundingClientRect();
-    blocksRef.current.forEach((blockRef) => {
-      if (blockRef) {
-        const blockRect = blockRef.getBoundingClientRect();
-        if (
-          playerRect.left < blockRect.left + blockRect.width &&
-          playerRect.left + playerRect.width > blockRect.left &&
-          playerRect.top < blockRect.top + blockRect.height &&
-          playerRect.height + playerRect.top > blockRect.top
-        ) {
-          console.log("collision detected");
-        }
+    blocksRef.current.forEach((blockRef, index) => {
+      const blockRect = blockRef.getBoundingClientRect();
+
+      // Check if the block has passed the player on the x-axis
+      if (blockRect.right < playerRect.left) {
+        console.log("A block has passed the player index=", index);
+        console.log(playerRect, blockRect);
       }
     });
-  }, [blocks]);
+  }, [blocks, bottomGap]);
+
   useEffect(() => {
     // Generate widths only for new blocks that don't have a width yet
     if (widths.length < blocks.length) {
