@@ -4,13 +4,13 @@ import "./App.css";
 function App() {
   // Giving 3 as initial value makes sure the block
   // doens't have small values at first.
-  const prevValue = useRef(3);
+  let prevValue = 3;
   const [blocks, setBlocks] = useState(
     Array(3)
       .fill(0)
       .map(() => {
-        const randomValue = generateRandom(prevValue.current);
-        prevValue.current = randomValue;
+        const randomValue = generateRandom(prevValue);
+        prevValue = randomValue;
         return randomValue;
       })
   );
@@ -18,6 +18,7 @@ function App() {
   const [bottomGap, setBottomGap] = useState(blocks[0] * 5 + 1);
   const [scrolling, setScrolling] = useState(false);
   const [widths, setWidths] = useState([]);
+  const [failed, setFailed] = useState(false);
   const containerRef = useRef(null);
   const intervalRef = useRef(null);
   const playerRef = useRef(null);
@@ -54,15 +55,18 @@ function App() {
     return () => clearInterval(intervalRef.current); // Clean up on unmount
   }, [scrolling]);
   useEffect(() => {
-    if (bottomGap <= 0) {
+    if (bottomGap <= 0 && !failed) {
+      console.log("triggered123");
       setScrolling(false);
-      alert("You fail!!!");
+      console.log("failed");
+      setFailed(true);
       setBlocks(
         Array(3)
           .fill(0)
           .map(() => {
-            const randomValue = generateRandom(prevValue.current);
-            prevValue.current = randomValue;
+            const randomValue = generateRandom(prevValue);
+            // eslint-disable-next-line
+            prevValue = randomValue;
             return randomValue;
           })
       );
@@ -71,11 +75,11 @@ function App() {
     }
   }, [bottomGap, blocks]);
   useEffect(() => {
-    console.log("blocks:", blocks);
-    if (!scrolling) {
+    if (failed) {
       setBottomGap(blocks[0] * 5 + 1);
+      setFailed(false);
     }
-  }, [blocks, scrolling]);
+  }, [blocks, failed]);
   useEffect(() => {
     const playerRect = playerRef.current.getBoundingClientRect();
     blocksRef.current.forEach((blockRef) => {

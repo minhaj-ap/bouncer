@@ -19,6 +19,7 @@ main {
 }
 .block {
   background-color: #c63d2f;
+  border-top: 10px solid white;
 }
 .controller {
   position: fixed;
@@ -43,7 +44,6 @@ main {
   background-color: black;
   position: absolute;
   left: calc(10em + 7px);
-  border-radius: 8px;
   transition: bottom 0.3s ease-in-out;
 }
 .up {
