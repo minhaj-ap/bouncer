@@ -4,13 +4,13 @@ import "./App.css";
 function App() {
   // Giving 3 as initial value makes sure the block
   // doens't have small values at first.
-  let prevValue = 3;
+  const prevValue = useRef(3);
   const [blocks, setBlocks] = useState(
     Array(3)
       .fill(0)
       .map(() => {
-        const randomValue = generateRandom(prevValue);
-        prevValue = randomValue;
+        const randomValue = generateRandom(prevValue.current);
+        prevValue.current = randomValue;
         return randomValue;
       })
   );
@@ -56,11 +56,26 @@ function App() {
   useEffect(() => {
     if (bottomGap <= 0) {
       setScrolling(false);
-      setBlocks((prev) => [prev[0], prev[1], prev[2]]);
-      setBottomGap(blocks[0] * 5 + 1);
-      alert("You lost !!!");
+      alert("You fail!!!");
+      setBlocks(
+        Array(3)
+          .fill(0)
+          .map(() => {
+            const randomValue = generateRandom(prevValue.current);
+            prevValue.current = randomValue;
+            return randomValue;
+          })
+      );
+      // This will reset the scroll
+      containerRef.current.scrollTo(0, 0);
     }
   }, [bottomGap, blocks]);
+  useEffect(() => {
+    console.log("blocks:", blocks);
+    if (!scrolling) {
+      setBottomGap(blocks[0] * 5 + 1);
+    }
+  }, [blocks, scrolling]);
   useEffect(() => {
     const playerRect = playerRef.current.getBoundingClientRect();
     blocksRef.current.forEach((blockRef) => {
@@ -124,7 +139,7 @@ function App() {
               <div
                 key={index}
                 ref={(el) => (blocksRef.current[index] = el)}
-                className="block"
+                className={`block ${index === 0 ? "first-block" : ""}`}
                 style={{
                   height: `${x * 5}rem`,
                   width: `${widths[index] * 3}rem`,

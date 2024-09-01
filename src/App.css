@@ -14,7 +14,7 @@ main {
   gap: 100px;
   align-items: baseline;
 }
-.blocks .block:first-child {
+.first-block {
   margin-left: 10em;
 }
 .block {
