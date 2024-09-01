@@ -11,7 +11,7 @@ main {
 
 .blocks {
   display: inline-flex;
-  gap: 100px;
+  gap: 200px;
   align-items: baseline;
 }
 .first-block {
@@ -44,7 +44,7 @@ main {
   background-color: black;
   position: absolute;
   left: 10em;
-  transition: bottom 0.3s ease-in-out;
+  transition: bottom 0.2s linear;
 }
 .up {
   position: absolute;

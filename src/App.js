@@ -6,23 +6,23 @@ function App() {
   // doens't have small values at first.
   let prevValue = 3;
   const [blocks, setBlocks] = useState(
-    Array(3)
+    Array(1)
       .fill(0)
       .map(() => {
-        const randomValue = generateRandom(prevValue);
-        prevValue = randomValue;
-        return randomValue;
+        return generateRandom(prevValue);
       })
   );
   // The bottom gap of the block changes on sound
-  const [bottomGap, setBottomGap] = useState(blocks[0] * 5 + 1);
+  const [bottomGap, setBottomGap] = useState(blocks[0] * 5);
   const [scrolling, setScrolling] = useState(false);
   const [widths, setWidths] = useState([]);
+  const [stopFalling, setStopFalling] = useState(false);
   const [failed, setFailed] = useState(false);
   const containerRef = useRef(null);
   const intervalRef = useRef(null);
   const playerRef = useRef(null);
   const blocksRef = useRef([]);
+  // To keep adding blocks
   useEffect(() => {
     let intervalId;
     if (scrolling) {
@@ -44,21 +44,21 @@ function App() {
     }
     return () => clearInterval(intervalId);
   }, [scrolling]);
+  // To keep it going down
   useEffect(() => {
-    if (scrolling) {
+    if (scrolling && !stopFalling) {
       intervalRef.current = setInterval(() => {
         DecreseHeight();
-      }, 500); // Decrease height every 500ms
+      }, 100); // Decrease height every 100ms
     } else {
       clearInterval(intervalRef.current);
     }
     return () => clearInterval(intervalRef.current); // Clean up on unmount
-  }, [scrolling]);
+  }, [scrolling, stopFalling]);
+  // To reset the game blocks
   useEffect(() => {
     if (bottomGap <= 0 && !failed) {
-      console.log("triggered123");
       setScrolling(false);
-      console.log("failed");
       setFailed(true);
       setBlocks(
         Array(3)
@@ -74,31 +74,41 @@ function App() {
       containerRef.current.scrollTo(0, 0);
     }
   }, [bottomGap, blocks]);
+  // To restart the game
   useEffect(() => {
     if (failed) {
-      setBottomGap(blocks[0] * 5 + 1);
+      setBottomGap(blocks[0] * 5);
       setFailed(false);
     }
   }, [blocks, failed]);
+  // To sense touching on the block
   useEffect(() => {
     const playerRect = playerRef.current.getBoundingClientRect();
-    blocksRef.current.forEach((blockRef, index) => {
-      const blockRect = blockRef.getBoundingClientRect();
-
-      // Check if the block has passed the player on the x-axis
-      if (blockRect.right < playerRect.left) {
-        console.log("A block has passed the player index=", index);
-        console.log(playerRect, blockRect);
+    blocksRef.current.forEach((blockRef,index)=>{
+      if (blockRef) {
+        const blockRect = blockRef.getBoundingClientRect();
+        // Check if the block has passed the player on the x-axis
+        if (
+          playerRect.left <= blockRect.right &&
+          playerRect.right >= blockRect.left &&
+          bottomGap === blocks[index] * 5
+        ) {
+          setStopFalling(true);
+        }
+        // Check if the block has passed the player
+        else if (blockRect.right < playerRect.left) {
+          setStopFalling(false);
+        }
       }
-    });
+    })
   }, [blocks, bottomGap]);
-
+  // To create widths
   useEffect(() => {
     // Generate widths only for new blocks that don't have a width yet
     if (widths.length < blocks.length) {
       const newWidths = blocks
         .slice(widths.length) // Only process new blocks
-        .map((x) => generateRandom(x));
+        .map((x) => generateRandom(widths[widths.length - 1]));
 
       setWidths((prev) => [...prev, ...newWidths]);
     }
@@ -108,7 +118,7 @@ function App() {
     setBottomGap((prev) => (prev += 5));
   }
   function DecreseHeight() {
-    setBottomGap((prev) => Math.max((prev -= 2), 0));
+    setBottomGap((prev) => Math.max((prev -= 1), 0));
   }
   return (
     <>
@@ -143,9 +153,9 @@ function App() {
                 className={`block ${index === 0 ? "first-block" : ""}`}
                 style={{
                   height: `${x * 5}rem`,
-                  width: `${widths[index] * 3}rem`,
+                  width: `${widths[index] * 2}rem`,
                 }}
-              ></div>
+              />
             );
           })}
         </div>
